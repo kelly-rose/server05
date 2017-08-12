@@ -7,7 +7,7 @@ const Survey = mongoose.model('surveys');
 
 //theory 10 - 125,126
 module.exports = app =>{
-    app.post('/api/surveys',requireLogin,requireCredits,(req,res)=>{
+    app.post('/api/surveys',requireLogin,requireCredits, async (req,res)=>{
         const {title, subject, body, recipients} = req.body;
 
         const survey = new Survey({
@@ -21,7 +21,17 @@ module.exports = app =>{
 
         //Great place to send an email !
         const mailer = new Mailer(survey,surveyTemplate(survey));
-        mailer.send();  //section 10 - 134
+        try {
+            await mailer.send();  //section 10 - 134
+
+            //section 10 - 136
+            await survey.save();    //save DB
+            req.user.credits -= 1;
+            const user = await req.user.save(); //save DB with updating user
+            res.send(user);
+        }catch (err){
+            res.status(422).send(err);
+        }
 
     });
 };
