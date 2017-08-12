@@ -29,6 +29,8 @@ app.use(passport.session());
 
 authRoutes(app);
 require('./routes/billingRoutes')(app);
+require('./routes/surveyRoutes')(app);
+
 
 /*
 ** section 9 - 109
